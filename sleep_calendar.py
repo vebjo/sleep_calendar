@@ -14,8 +14,6 @@ def convert_time(time):
     seconds = (time.hour * 60 + time.minute) * 60 + time.second
     return seconds/3600
 
-
-
 DATE_FORMAT = "%d-%m-%Y %I:%M %p"
 
 sleep_intervals = []
@@ -35,6 +33,7 @@ def get_data():
     
     file.close()
 
+    #Start and end days for period, number of days
     start_date = min([sleep[0] for sleep in sleep_intervals])
     end_date = max([sleep[1] for sleep in sleep_intervals])
     num_days = (end_date - start_date).days + 1
@@ -50,13 +49,18 @@ def create_calendar(sleep, start, end, day):
 
     fig, ax = plt.subplots()
 
-    ax.set_yticks(range(days))
+    #Sets labels based on datetiems. Iterates backwards
+    ax.set_yticks(range(days)) #TODO: try halfstep iterations
     ax.set_yticklabels([(end - datetime.timedelta(days=i)).date() for i in range(days)], fontdict={'verticalalignment':'bottom'})
 
+    #Sets labels based on times
     ax.set_xticks(range(24))
     ax.set_xticklabels([(dt.combine(datetime.date(1,1,1), datetime.time(20, 0, 0)) + datetime.timedelta(hours=j)).time() for j in range(24)])
+
+    #Adjusts overlapping labels
     fig.autofmt_xdate()
 
+    #Draws sleep intervals
     iter_day = end.day
     for begin, stop in sleep:
         s = convert_time(begin)
