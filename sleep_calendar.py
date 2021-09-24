@@ -55,6 +55,7 @@ def create_calendar(sleep, start, end, days):
     fig.autofmt_xdate()
 
     #Calculates the intervals
+    avg_start = 0
     iter_day = end.day
     for begin, stop in sleep:
         s = convert_time(begin)
@@ -79,6 +80,11 @@ def create_calendar(sleep, start, end, days):
         #Draws sleep intervals
         ax.add_patch(Rectangle((s + 4, day), e-s, .8, color='gray'))
 
+        avg_start += s
+    
+    avg_start = (avg_start / len(sleep_intervals)) + 4
+    plt.axvline(x=avg_start, label='Avg. falling asleep time', c='red')
+    plt.legend()
     plt.grid(axis = 'x', linestyle = '--')
     plt.show()
 
