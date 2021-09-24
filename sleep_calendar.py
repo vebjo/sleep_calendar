@@ -1,11 +1,8 @@
 from os import close
 import itertools
-import numpy as np
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from numpy.core.defchararray import center
-import pandas as pd
 import csv
 import datetime
 from datetime import datetime as dt
@@ -38,20 +35,17 @@ def get_data():
     end_date = max([sleep[1] for sleep in sleep_intervals])
     num_days = (end_date - start_date).days + 1
 
-    #start_date = start_time.date()
-    #end_date = end_time.date()
-
     return(sleep_intervals, start_date, end_date, num_days)
 
 
 #Plots the calendar using data from method above
-def create_calendar(sleep, start, end, day):
+def create_calendar(sleep, start, end, days):
 
     fig, ax = plt.subplots()
 
     #Sets labels based on datetiems. Iterates backwards
-    ax.set_yticks(range(days)) #TODO: try halfstep iterations
-    ax.set_yticklabels([(end - datetime.timedelta(days=i)).date() for i in range(days)], fontdict={'verticalalignment':'bottom'})
+    ax.set_yticks(range(days + 1)) #TODO: try halfstep iterations
+    ax.set_yticklabels([(end - datetime.timedelta(days=i)).date() for i in range(days + 1)], fontdict={'verticalalignment':'bottom'})
 
     #Sets labels based on times
     ax.set_xticks(range(24))
@@ -60,37 +54,37 @@ def create_calendar(sleep, start, end, day):
     #Adjusts overlapping labels
     fig.autofmt_xdate()
 
-    #Draws sleep intervals
+    #Calculates the intervals
     iter_day = end.day
     for begin, stop in sleep:
         s = convert_time(begin)
         e = convert_time(stop)
         day = iter_day - begin.day
+        
+        #Moves the interval one day later when time crosses midnight
+        if begin.day != stop.day:
+            day = iter_day - stop.day
+        
+        #The graph ends and starts at 20 o'clock, this moves it left. 
+        if s > 20: 
+            s -= 24
 
-        #if begin.day != stop.day:
-        #    continue
+        #For when the interval crosses 20 o'clock
+        if s < 20 < e: 
+            ax.add_patch(Rectangle((s + 4, day), 20, .8, color='gray'))
+            s = - 4
+            e -= 24
+            day = day - 1
 
-        ax.add_patch(Rectangle((s + 4, day), e-s, .8, color='cyan'))
+        #Draws sleep intervals
+        ax.add_patch(Rectangle((s + 4, day), e-s, .8, color='gray'))
 
+    plt.grid(axis = 'x', linestyle = '--')
     plt.show()
 
 
-"""
-    data = pd.DataFrame({"start": start, "end": end})
-
-    for s, e in zip(data['start'].values, data['end'].values):
-        ax.add_patch(Rectangle((s, day.pop(0)), width=(e-s), height=.4, color='cyan'))
-
-
-    #removes ticks and borders
-    plt.tick_params(left=False, bottom=False)
-    [spine.set_visible(False) for spine in plt.gca().spines.values()]
-
-    #show figure
-    fig.align_labels()
-    plt.show()
-
-"""
-
+#Processes data
 sleep, start, end, days = get_data()
+
+#Creates and shows calendar
 create_calendar(sleep, start, end, days)
