@@ -16,7 +16,7 @@ DATE_FORMAT = "%d-%m-%Y %I:%M %p"
 sleep_intervals = []
 
 def get_data():
-    with open('fitbit_export_20210516.csv') as file:
+    with open('') as file:
         csv_reader = csv.reader(file, delimiter=',')
         next(itertools.islice(csv_reader, 2, 2), None)
 
@@ -44,7 +44,7 @@ def create_calendar(sleep, start, end, days):
     fig, ax = plt.subplots()
 
     #Sets labels based on datetiems. Iterates backwards
-    ax.set_yticks(range(days + 1)) #TODO: try halfstep iterations
+    ax.set_yticks(range(days + 1)) 
     ax.set_yticklabels([(end - datetime.timedelta(days=i)).date() for i in range(days + 1)], fontdict={'verticalalignment':'bottom'})
 
     #Sets labels based on times
